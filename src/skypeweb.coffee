@@ -10,21 +10,23 @@ class SkypeWeb extends Adapter
 
   constructor: (@robot) ->
     super @robot
-    url = "https://client-s.gateway.messenger.live.com"
+    url      = "https://client-s.gateway.messenger.live.com"
     @urlPoll = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
     @urlSend = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @headers = {}
     @bodySend = messagetype: 'RichText', contenttype: 'text', content: ''
+
+    # Configuration
     @skypeUsername = process.env.HUBOT_SKYPE_USERNAME
     @skypePassword = process.env.HUBOT_SKYPE_PASSWORD
-
     @reconnectInterval = false
     if process.env.HUBOT_SKYPE_RECONNECT
       @reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
       if @reconnectInterval < 20
-        @robot.logger.warn 'HUBOT_SKYPE_RECONNECT is the adapter reconnect' +
-                           'interval in minutes! (optional parameter)'
+        @robot.logger.warning 'HUBOT_SKYPE_RECONNECT is the adapter ' +
+                  'reconnect interval in minutes! (optional parameter)'
         throw new Error 'Minimum reconnect interval is 20 minutes!'
+      @reconnectInterval *= 60 * 1000  # convert minutes to milliseconds
 
 
   run: ->
@@ -34,7 +36,7 @@ class SkypeWeb extends Adapter
         self.emit 'connected'
         self.pollRequest()
         if @reconnectInterval
-          setInterval (-> self.login()), @reconnectInterval * 60 * 1000
+          setInterval (-> self.login()), @reconnectInterval
           self.robot.logger.info "SkypeWeb adapter configured to reconnect" +
                                  "every #{@reconnectInterval} minutes"
       error: ->
@@ -68,7 +70,7 @@ class SkypeWeb extends Adapter
           page.close()
           ph.exit 0
           options?.error?()
-        ), 50000
+        ), 50000  # after 50 secs
 
 
         # Monitor outgoing requests until proper poll request appears
@@ -105,7 +107,7 @@ class SkypeWeb extends Adapter
               document.getElementById('password').value = password
               document.getElementById('signIn').click()
             ), (->), self.skypeUsername, self.skypePassword
-          ), 5000
+          ), 5000  # after 5 secs
 
     ), dnodeOpts: weak: false  # Needed for PhantomJS on Windows
 
@@ -150,7 +152,9 @@ class SkypeWeb extends Adapter
     queue = @sendQueues[user]
     # Split messages that can't be sent at once
     if msg.length > 1500
+      @robot.logger.warning 'Message too long for sending! Splitting...'
       index = msg.substring(0, 1500).lastIndexOf("\n")
+      index = 1500 if index is -1
       @sendInQueue user, msg.substring 0, index
       @sendInQueue user, msg.substring index + 1
       return
@@ -174,12 +178,14 @@ class SkypeWeb extends Adapter
       body: @bodySend,
       gzip: true, json: true,
       (error, response, body) ->
-        self.robot.logger.debug 'send:' + response.statusCode
+        unless response.statusCode in [200, 201]
+          self.robot.logger.error "send request returned status " +
+              "#{response.statusCode}. user='#{user}' msg='#{msg}'"
         if error
-          self.robot.logger.error error
+          self.robot.logger.error "send request failed: " + error
         self.sendQueues[user].shift()
+        # process remaining messages in queue
         if self.sendQueues[user].length isnt 0
-          self.robot.logger.debug "sendRequest recurs"
           self.sendRequest user, self.sendQueues[user][0]
     )
 
@@ -200,7 +206,7 @@ class SkypeWeb extends Adapter
               body = JSON.parse body
               self.onEventMessage msg for msg in body.eventMessages
           catch err
-            self.robot.logger.error err
+            self.robot.logger.error 'Failure in parsing poll results: ' + err
         self.pollRequest()
     )
 
