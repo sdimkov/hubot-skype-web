@@ -5,18 +5,8 @@ util    = require 'util'
 {Adapter, TextMessage, User} = require 'hubot'
 
 
-# Configuration
-reconnectInterval = false
-if process.env.HUBOT_SKYPE_RECONNECT
-  reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
-  if reconnectInterval < 20
-    console.error "HUBOT_SKYPE_RECONNECT is the adapter " +
-                  "reconnect interval in minutes!"
-    console.error "Minimum reconnect interval is 20 minutes!"
-    process.exit 1
-
-
 class SkypeWeb extends Adapter
+
 
   constructor: (@robot) ->
     super @robot
@@ -28,6 +18,14 @@ class SkypeWeb extends Adapter
     @skypeUsername = process.env.HUBOT_SKYPE_USERNAME
     @skypePassword = process.env.HUBOT_SKYPE_PASSWORD
 
+    @reconnectInterval = false
+    if process.env.HUBOT_SKYPE_RECONNECT
+      @reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
+      if @reconnectInterval < 20
+        @robot.logger.warn 'HUBOT_SKYPE_RECONNECT is the adapter reconnect' +
+                           'interval in minutes! (optional parameter)'
+        throw new Error 'Minimum reconnect interval is 20 minutes!'
+
 
   run: ->
     self = @
@@ -35,14 +33,12 @@ class SkypeWeb extends Adapter
       success: ->
         self.emit 'connected'
         self.pollRequest()
-        if reconnectInterval
-          setInterval (-> self.login()), reconnectInterval * 60 * 1000
+        if @reconnectInterval
+          setInterval (-> self.login()), @reconnectInterval * 60 * 1000
           self.robot.logger.info "SkypeWeb adapter configured to reconnect" +
-                                 "every #{reconnectInterval} minutes"
+                                 "every #{@reconnectInterval} minutes"
       error: ->
-        self.robot.logger.info 'Terminating hubot due to ' +
-                               'failure in initial login!'
-        process.exit 1
+        throw new Error 'SkypeWeb adapter failure in initial login!'
 
 
   send: (envelope, strings...) ->
