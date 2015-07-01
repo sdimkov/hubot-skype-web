@@ -5,20 +5,20 @@ util    = require 'util'
 {Adapter, TextMessage, User} = require 'hubot'
 
 
-class SkypeWeb extends Adapter
+class SkypeWebAdapter extends Adapter
 
 
   # @param robot [Robot] the instance of hubot that uses the adapter
   constructor: (@robot) ->
     super @robot
     url      = "https://client-s.gateway.messenger.live.com"
-    @urlPoll = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
-    @urlSend = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
+    @pollUrl = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
+    @sendUrl = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @headers = {}
-    @bodySend = messagetype: 'RichText', contenttype: 'text', content: ''
+    @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
     # Configuration
-    @skypeUsername = process.env.HUBOT_SKYPE_USERNAME
-    @skypePassword = process.env.HUBOT_SKYPE_PASSWORD
+    @username = process.env.HUBOT_SKYPE_USERNAME
+    @password = process.env.HUBOT_SKYPE_PASSWORD
     @reconnectInterval = false
     if process.env.HUBOT_SKYPE_RECONNECT
       @reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
@@ -117,7 +117,7 @@ class SkypeWeb extends Adapter
               document.getElementById('username').value = username
               document.getElementById('password').value = password
               document.getElementById('signIn').click()
-            ), (->), self.skypeUsername, self.skypePassword
+            ), (->), self.username, self.password
           ), 5000  # after 5 secs
 
     ), dnodeOpts: weak: false  # Needed for PhantomJS on Windows
@@ -159,7 +159,7 @@ class SkypeWeb extends Adapter
       @eventsCache.push msg.resource.id
       userID = msg.resource.from.split('/contacts/')[1].replace '8:', ''
       # Ignore messages sent by the robot
-      return if userID is @skypeUsername
+      return if userID is @username
       user = @robot.brain.userForId userID
       user.room = msg.resource.conversationLink.split('/conversations/')[1]
       # Let robot know messages in personal chats are directed at him
@@ -213,12 +213,12 @@ class SkypeWeb extends Adapter
     self = @
     now = new Date().getTime()
     @headers.ContextId        = now
-    @bodySend.clientmessageid = now
-    @bodySend.content = msg
+    @sendBody.clientmessageid = now
+    @sendBody.content = msg
     request.post(
-      url: @urlSend(user),
+      url: @sendUrl(user),
       headers: @headers,
-      body: @bodySend,
+      body: @sendBody,
       gzip: true, json: true,
       (error, response, body) ->
         unless response.statusCode in [200, 201]
@@ -241,7 +241,7 @@ class SkypeWeb extends Adapter
     self = @
     @headers.ContextId = new Date().getTime()
     request.post(
-      url: @urlPoll,
+      url: @pollUrl,
       headers: @headers,
       gzip: true,
       (error, response, body) ->
@@ -259,4 +259,4 @@ class SkypeWeb extends Adapter
 
 
 exports.use = (robot) ->
-  new SkypeWeb robot
+  new SkypeWebAdapter robot
