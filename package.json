@@ -4,7 +4,7 @@
     "name": "Stoyan Dimkov",
     "email": "stoyan.dimkov@gmail.com"
   },
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Hubot adapter for Skype that connects via Skype Web",
   "main": "src/skypeweb.coffee",
   "dependencies": {
