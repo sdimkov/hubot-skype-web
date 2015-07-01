@@ -1,6 +1,7 @@
 phantom = require 'phantom'
 request = require 'request'
 util    = require 'util'
+escape  = require 'escape-html'
 
 {Adapter, TextMessage, User} = require 'hubot'
 
@@ -214,7 +215,7 @@ class SkypeWebAdapter extends Adapter
     now = new Date().getTime()
     @headers.ContextId        = now
     @sendBody.clientmessageid = now
-    @sendBody.content = msg
+    @sendBody.content = escape msg
     request.post(
       url: @sendUrl(user),
       headers: @headers,
