@@ -8,6 +8,7 @@ util    = require 'util'
 class SkypeWeb extends Adapter
 
 
+  # @param robot [Robot] the instance of hubot that uses the adapter
   constructor: (@robot) ->
     super @robot
     url      = "https://client-s.gateway.messenger.live.com"
@@ -15,7 +16,6 @@ class SkypeWeb extends Adapter
     @urlSend = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @headers = {}
     @bodySend = messagetype: 'RichText', contenttype: 'text', content: ''
-
     # Configuration
     @skypeUsername = process.env.HUBOT_SKYPE_USERNAME
     @skypePassword = process.env.HUBOT_SKYPE_PASSWORD
@@ -29,6 +29,8 @@ class SkypeWeb extends Adapter
       @reconnectInterval *= 60 * 1000  # convert minutes to milliseconds
 
 
+  # Starts the adapter
+  #
   run: ->
     self = @
     self.login
@@ -43,10 +45,16 @@ class SkypeWeb extends Adapter
         throw new Error 'SkypeWeb adapter failure in initial login!'
 
 
+  # Entry point for messages from hubot
+  #
   send: (envelope, strings...) ->
     @sendInQueue envelope.room, msg for msg in strings
 
 
+  # Replies back to a specific user.
+  #
+  # @note it prefixes messages only in group chats
+  #
   reply: (envelope, strings...) ->
     # Only prefix replies in group chats
     if envelope.user.room.indexOf('19:') is 0
@@ -59,11 +67,18 @@ class SkypeWeb extends Adapter
     @send envelope, strings...
 
 
+  # @private
+  # Login to Skype web client and retrieve a sample poll request.
+  #
+  # @note Uses PhantomJS to render the web page and monitor network traffic
+  #
+  # @option options [Function] success executed if the correct requests are found
+  # @option options [Function] error executed if the time exceeds the limit
+  #
   login: (options = {}) ->
     self = @
     phantom.create ((ph) ->
       ph.createPage (page) ->
-
         # Execute fail condition if login time limit expires
         errorTimer = setTimeout (->
           self.robot.logger.error 'SkypeWeb adapter failed to login!'
@@ -71,8 +86,6 @@ class SkypeWeb extends Adapter
           ph.exit 0
           options?.error?()
         ), 50000  # after 50 secs
-
-
         # Monitor outgoing requests until proper poll request appears
         requestsCount = 0
         success       = false
@@ -93,12 +106,10 @@ class SkypeWeb extends Adapter
                 options?.success?()
           else
             self.robot.logger.debug request.url
-
         # Use sane user-agent
         page.set 'settings.userAgent',
           'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 ' +
           '(KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
-
         # Login to skype web
         page.open 'https://web.skype.com', (status) ->
           setTimeout (->
@@ -112,6 +123,14 @@ class SkypeWeb extends Adapter
     ), dnodeOpts: weak: false  # Needed for PhantomJS on Windows
 
 
+  # @private
+  # Stores all request headers of the intercepted request for later use.
+  #
+  # @note Most importantly it optains the RegistrationToken which is used
+  #   to authenticate the requests for receiving or sending messages
+  #
+  # @param request [Request] the poll request made from skype web client
+  #
   copyHeaders: (request) ->
     @headers = {}
     for header in request.headers
@@ -124,6 +143,12 @@ class SkypeWeb extends Adapter
 
 
   eventsCache: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+  # @private
+  # Handles all Skype events coming from the server
+  #
+  # @param msg [EventMessage] the event object
+  #
   onEventMessage: (msg) ->
     if (msg.resourceType is 'NewMessage' and
         msg.resource?.messagetype in ['Text', 'RichText'])
@@ -147,6 +172,16 @@ class SkypeWeb extends Adapter
 
 
   sendQueues: {}
+
+  # @private
+  # Store skype message to be send in queues
+  #
+  # @note This prevents this prevents newer messages to be received prior
+  #   to older ones due to the async nature of the requests being made
+  #
+  # @param user [String] the recipient of the message
+  # @param msg [String] the contents of the message to be send
+  #
   sendInQueue: (user, msg) ->
     @sendQueues[user] ||= []
     queue = @sendQueues[user]
@@ -166,6 +201,14 @@ class SkypeWeb extends Adapter
       queue[len-2] += "\n" + queue.pop()
 
 
+  # @private
+  # Sends POST request to skype containing new message to given user
+  #
+  # @note it recursively calls itself until queues are empty
+  #
+  # @param user [String] the recipient of the message
+  # @param msg [String] the contents of the message to be send
+  #
   sendRequest: (user, msg) ->
     self = @
     now = new Date().getTime()
@@ -189,7 +232,11 @@ class SkypeWeb extends Adapter
           self.sendRequest user, self.sendQueues[user][0]
     )
 
-
+  # @private
+  # Polls the server for new events.
+  #
+  # @note it recursively calls itself
+  #
   pollRequest: ->
     self = @
     @headers.ContextId = new Date().getTime()
