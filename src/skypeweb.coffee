@@ -238,6 +238,7 @@ class SkypeWebAdapter extends Adapter
           self.sendRequest user, self.sendQueues[user][0]
     )
 
+
   # @private
   # Polls the server for new events.
   #
