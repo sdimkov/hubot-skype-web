@@ -20,14 +20,13 @@ class SkypeWebAdapter extends Adapter
     # Configuration
     @username = process.env.HUBOT_SKYPE_USERNAME
     @password = process.env.HUBOT_SKYPE_PASSWORD
-    @reconnectInterval = false
+    @reconnectInterval = 240
     if process.env.HUBOT_SKYPE_RECONNECT
       @reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
       if @reconnectInterval < 20
         @robot.logger.warning 'HUBOT_SKYPE_RECONNECT is the adapter ' +
                   'reconnect interval in minutes! (optional parameter)'
         throw new Error 'Minimum reconnect interval is 20 minutes!'
-      @reconnectInterval *= 60 * 1000  # convert minutes to milliseconds
 
 
   # Starts the adapter
@@ -39,7 +38,7 @@ class SkypeWebAdapter extends Adapter
         self.emit 'connected'
         self.pollRequest()
         if @reconnectInterval
-          setInterval (-> self.login()), @reconnectInterval
+          setInterval (-> self.login()), @reconnectInterval * 60 * 1000
           self.robot.logger.info "SkypeWeb adapter configured to reconnect" +
                                  "every #{@reconnectInterval} minutes"
       error: ->
