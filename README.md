@@ -30,7 +30,7 @@ Mandatory Environment variables:
 * `HUBOT_SKYPE_PASSWORD` _String_ - hubot's skype account password in plain text
 
 Optional Environment variables:
-* `HUBOT_SKYPE_RECONNECT` _Integer_ - The duration between reconnects in minutes. Minimal value is 20. I would recommend 240. Reconnect does not disturb hubot's uptime.
+* `HUBOT_SKYPE_RECONNECT` _Integer, default: 240_ - The duration between reconnects in minutes. Minimum value is 20. Reconnect does not disturb hubot's uptime.
 * `HUBOT_LOG_LEVEL` _String [debug|info|notice|warning|error|critical|alert|emergency], default: info_ - Set the log level of Hubot. The Fleep adapter can output extensive debug messages.
 
 Contributing
