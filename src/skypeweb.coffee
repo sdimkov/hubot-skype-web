@@ -17,9 +17,15 @@ class SkypeWebAdapter extends Adapter
     @sendUrl = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @headers = {}
     @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
-    # Configuration
+    # Read and validate username
     @username = process.env.HUBOT_SKYPE_USERNAME
+    if not @username or @username.length < 2
+      throw new Error 'Provide a valid username in HUBOT_SKYPE_USERNAME!'
+    # Read and validate password
     @password = process.env.HUBOT_SKYPE_PASSWORD
+    if not @username or @username.length < 2
+      throw new Error 'Provide a valid password in HUBOT_SKYPE_PASSWORD!'
+    # Read and validate reconnect interval
     @reconnectInterval = 240
     if process.env.HUBOT_SKYPE_RECONNECT
       @reconnectInterval = parseInt process.env.HUBOT_SKYPE_RECONNECT
