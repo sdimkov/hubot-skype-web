@@ -43,10 +43,10 @@ class SkypeWebAdapter extends Adapter
       success: ->
         self.emit 'connected'
         self.pollRequest()
-        if @reconnectInterval
-          setInterval (-> self.login()), @reconnectInterval * 60 * 1000
-          self.robot.logger.info "SkypeWeb adapter configured to reconnect" +
-                                 "every #{@reconnectInterval} minutes"
+        if self.reconnectInterval
+          setInterval (-> self.login()), self.reconnectInterval * 60 * 1000
+          self.robot.logger.info "SkypeWeb adapter configured to reconnect " +
+                                 "every #{self.reconnectInterval} minutes"
       error: ->
         throw new Error 'SkypeWeb adapter failure in initial login!'
 
