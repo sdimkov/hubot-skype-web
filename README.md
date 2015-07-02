@@ -18,7 +18,7 @@ What's missing:
 * Sending / Receiving of files
 * Recognizing contact presense (appearing online ; going offline..etc)
 
-Also note that this adapter can not connect to the old P2P group chats. That's a general limitation of Skype's web offerings as it does not go through Skype's servers. Read more about cloud-based and P2P-based Skype groups [here](https://support.skype.com/en/faq/FA12381/what-is-the-cloud)
+Also note that this adapter can not connect to the old P2P group chats. That's a general limitation of Skype's web offerings as the old P2P groups don't go through Skype's servers. Read more about cloud-based and P2P-based Skype groups [here](https://support.skype.com/en/faq/FA12381/what-is-the-cloud)
 
 Configuration
 -------------
@@ -31,7 +31,7 @@ Mandatory Environment variables:
 
 Optional Environment variables:
 * `HUBOT_SKYPE_RECONNECT` _Integer, default: 240_ - The duration between reconnects in minutes. Minimum value is 20. Reconnect does not disturb hubot's uptime.
-* `HUBOT_LOG_LEVEL` _String [debug|info|notice|warning|error|critical|alert|emergency], default: info_ - Set the log level of Hubot. The Fleep adapter can output extensive debug messages.
+* `HUBOT_LOG_LEVEL` _String [debug|info|notice|warning|error|critical|alert|emergency], default: info_ - Set the log level of Hubot. The SkypeWeb adapter can output extensive debug messages.
 
 Contributing
 ------------
