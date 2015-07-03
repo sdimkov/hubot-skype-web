@@ -34,11 +34,34 @@
         </p>
       </nav>
       <div id='filecontents'>
-        <h1 id="hubot-skype-web">hubot-skype-web</h1><p>A Skype adapter for Hubot that connects via Skype web.</p>
+        <h1 id="hubot-skype-web">hubot-skype-web</h1><p>A <a href="http://www.skype.com/">Skype</a> adapter for <a href="https://hubot.github.com/">Hubot</a> that connects via Skype web.</p><p><a href="https://github.com/sdimkov/hubot-skype-web/releases"><img src="https://img.shields.io/npm/v/hubot-skype-web.svg" alt="Version"></a>
+<a href="https://github.com/sdimkov/hubot-skype-web/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/express.svg" alt="Licence"></a>
+<a href="https://www.npmjs.com/package/hubot-skype-web"><img src="https://img.shields.io/npm/dm/hubot-skype-web.svg" alt="Downloads"></a></p><p>This adapter allows integrating your Hubot with Skype.</p><p>Available functionality:</p><ul>
+<li>Sending / Receiving messages in personal chats with contacts</li>
+<li>Sending / Receiving messages in group chats with anyone in the group (non-contacts included)</li>
+</ul><p>What&#39;s missing:</p><ul>
+<li>Sending / Accepting / Rejecting contact requests</li>
+<li>Sending / Receiving of files</li>
+<li>Recognizing contact presense (appearing online ; going offline..etc)</li>
+</ul><p>Also note that this adapter can not connect to the old P2P group chats. That&#39;s a general limitation of Skype&#39;s web offerings as the old P2P groups don&#39;t go through Skype&#39;s servers. Read more about cloud-based and P2P-based Skype groups <a href="https://support.skype.com/en/faq/FA12381/what-is-the-cloud">here</a></p><h2 id="getting-started">Getting started</h2>
+<ol>
+<li>Install <a href="http://phantomjs.org/">PhantomJS</a>. This adapter depends on <a href="https://github.com/sgentle/phantomjs-node">phantom</a> which expects you to manually install the PhantomJS binary and expose it in PATH</li>
+<li>Export necessary environment variables.</li>
+<li>Add <code>hubot-skype-web</code> as dependency in your package.json: <code>npm install hubot-skype-web --save</code></li>
+<li>Start your hubot with the Skype Web adapter: <code>hubot --adapter skype-web</code></li>
+</ol>
+<h2 id="configuration">Configuration</h2><p>This adapter can only be configured via Environment variables.</p><p>Mandatory Environment variables:</p><ul>
+<li><code>HUBOT_SKYPE_USERNAME</code> <em>String</em> - hubot&#39;s skype account username</li>
+<li><code>HUBOT_SKYPE_PASSWORD</code> <em>String</em> - hubot&#39;s skype account password in plain text</li>
+</ul><p>Optional Environment variables:</p><ul>
+<li><code>HUBOT_SKYPE_RECONNECT</code> <em>Integer, default: 240</em> - The duration between reconnects in minutes. Minimum value is 20. Reconnect does not disturb hubot&#39;s uptime.</li>
+<li><code>HUBOT_LOG_LEVEL</code> <em>String [debug|info|notice|warning|error|critical|alert|emergency], default: info</em> - Set the log level of Hubot. The SkypeWeb adapter can output extensive debug messages.</li>
+</ul>
+<h2 id="contributing">Contributing</h2><p>Patches are welcome. Browse the <a href="https://cdn.rawgit.com/sdimkov/hubot-skype-web/v0.9.3/doc/index.html">documentation</a> to get started.</p><h2 id="licence">Licence</h2><p>The MIT License (MIT). Please see LICENCE file for more information.</p>
       </div>
     </div>
     <div id='footer'>
-  July 02, 15 01:36:37 by
+  July 03, 15 03:40:56 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
