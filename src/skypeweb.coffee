@@ -12,11 +12,15 @@ class SkypeWebAdapter extends Adapter
   # @param robot [Robot] the instance of hubot that uses the adapter
   constructor: (@robot) ->
     super @robot
-    url      = "https://client-s.gateway.messenger.live.com"
-    @pollUrl = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
-    @sendUrl = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
-    @headers = {}
+
+    url       = "https://client-s.gateway.messenger.live.com"
+    @pollUrl  = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
+    @sendUrl  = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
+    @sendQueues = {}
+    @headers    = {}
+    @eventsCache = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
     # Read and validate username
     @username = process.env.HUBOT_SKYPE_USERNAME
     if not @username or @username.length < 2
@@ -152,8 +156,6 @@ class SkypeWebAdapter extends Adapter
     @headers['Accept-Encoding'] = 'gzip, deflate'
 
 
-  eventsCache: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
   # @private
   # Handles all Skype events coming from the server
   #
@@ -180,8 +182,6 @@ class SkypeWebAdapter extends Adapter
       # Provide the messages to the robot
       @receive new TextMessage user, msg.resource.content, msg.resource.id
 
-
-  sendQueues: {}
 
   # @private
   # Store skype message to be send in queues
