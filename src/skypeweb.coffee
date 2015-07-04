@@ -20,6 +20,7 @@ class SkypeWebAdapter extends Adapter
     @sendQueues = {}
     @headers    = {}
     @eventsCache = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    @respondPattern = @robot.respondPattern /.*/
 
     # Read and validate username
     @username = process.env.HUBOT_SKYPE_USERNAME
@@ -177,8 +178,10 @@ class SkypeWebAdapter extends Adapter
       # Let robot know messages in personal chats are directed at him
       if user.room.indexOf('19:') isnt 0
         unless user.shell? and user.shell[user.room]
-          @robot.logger.debug 'Prefix personal message from ' + user.name
-          msg.resource.content = @robot.name + ': ' + msg.resource.content
+          # Only prefix messages that aren't already prefixed by sender
+          unless @respondPattern.test msg.resource.content
+            @robot.logger.debug 'Prefix personal message from ' + user.name
+            msg.resource.content = @robot.name + ': ' + msg.resource.content
       # Provide the messages to the robot
       @receive new TextMessage user, msg.resource.content, msg.resource.id
 
