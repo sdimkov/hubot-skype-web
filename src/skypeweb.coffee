@@ -83,6 +83,10 @@ class SkypeWebAdapter extends Adapter
   #
   login: (options = {}) ->
     self = @
+    phantomOptions = {}
+    if process.platform.indexOf('win') isnt -1
+      # Disable dnode with weak on Windows hosts
+      phantomOptions.dnodeOpts = weak: false
     phantom.create ((ph) ->
       ph.createPage (page) ->
         # Execute fail condition if login time limit expires
@@ -126,7 +130,7 @@ class SkypeWebAdapter extends Adapter
             ), (->), self.username, self.password
           ), 5000  # after 5 secs
 
-    ), dnodeOpts: weak: false  # Needed for PhantomJS on Windows
+    ), phantomOptions
 
 
   # @private
