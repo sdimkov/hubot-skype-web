@@ -119,7 +119,7 @@ class SkypeWebAdapter extends Adapter
                 success = true
                 options?.success?()
           else
-            self.robot.logger.debug request.url
+            self.robot.logger.debug 'Skype during login: ' + request.url
         # Use sane user-agent
         page.set 'settings.userAgent',
           'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 ' +
@@ -177,7 +177,7 @@ class SkypeWebAdapter extends Adapter
       # Let robot know messages in personal chats are directed at him
       if user.room.indexOf('19:') isnt 0
         unless user.shell? and user.shell[user.room]
-          @robot.logger.debug 'prefix personal message'
+          @robot.logger.debug 'Prefix personal message from ' + user.name
           msg.resource.content = @robot.name + ': ' + msg.resource.content
       # Provide the messages to the robot
       @receive new TextMessage user, msg.resource.content, msg.resource.id
@@ -232,10 +232,10 @@ class SkypeWebAdapter extends Adapter
       gzip: true, json: true,
       (error, response, body) ->
         unless response.statusCode in [200, 201]
-          self.robot.logger.error "send request returned status " +
+          self.robot.logger.error "Send request returned status " +
               "#{response.statusCode}. user='#{user}' msg='#{msg}'"
         if error
-          self.robot.logger.error "send request failed: " + error
+          self.robot.logger.error "Send request failed: " + error
         self.sendQueues[user].shift()
         # process remaining messages in queue
         if self.sendQueues[user].length isnt 0
@@ -257,14 +257,14 @@ class SkypeWebAdapter extends Adapter
       gzip: true,
       (error, response, body) ->
         if error
-          self.robot.logger.error error
+          self.robot.logger.error 'Poll request failed: ' + error
         else
           try
             if body.trim()
               body = JSON.parse body
               self.onEventMessage msg for msg in body.eventMessages
           catch err
-            self.robot.logger.error 'Failure in parsing poll results: ' + err
+            self.robot.logger.error 'Parsing poll results failed: ' + err
         self.pollRequest()
     )
 
