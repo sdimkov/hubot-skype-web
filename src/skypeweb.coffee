@@ -2,6 +2,7 @@ phantom = require 'phantom'
 request = require 'request'
 util    = require 'util'
 escape  = require 'escape-html'
+fs      = require 'fs'
 
 {Adapter, TextMessage, User} = require 'hubot'
 
@@ -18,7 +19,7 @@ class SkypeWebAdapter extends Adapter
     @sendUrl  = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
     @sendQueues = {}
-    @headers    = {}
+    @headers    = false
     @eventsCache = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     @respondPattern = @robot.respondPattern /.*/
 
@@ -44,16 +45,26 @@ class SkypeWebAdapter extends Adapter
   #
   run: ->
     self = @
-    self.login
-      success: ->
-        self.emit 'connected'
-        self.pollRequest()
-        if self.reconnectInterval
-          setInterval (-> self.login()), self.reconnectInterval * 60 * 1000
-          self.robot.logger.info "SkypeWeb adapter configured to reconnect " +
-                                 "every #{self.reconnectInterval} minutes"
-      error: ->
-        throw new Error 'SkypeWeb adapter failure in initial login!'
+    success = ->
+      self.emit 'connected'
+      self.pollRequest()
+      if self.reconnectInterval
+        setInterval (-> self.login()), self.reconnectInterval * 60 * 1000
+        self.robot.logger.info "SkypeWeb adapter configured to reconnect " +
+                               "every #{self.reconnectInterval} minutes"
+    error = ->
+      throw new Error 'SkypeWeb adapter failure in initial login!'
+
+    backup = false
+    try backup = JSON.parse fs.readFileSync 'hubot-skype-web.backup', 'utf8'
+
+    if backup and new Date(backup.expire) > new Date()
+      self.robot.logger.info 'Skype headers restored from backup.'
+      self.headers = backup.headers
+      success()
+      setTimeout (-> self.login()), 5000
+    else
+      @login success: success, error: error
 
 
   # Entry point for messages from hubot
@@ -155,6 +166,17 @@ class SkypeWebAdapter extends Adapter
     @headers['Host'] = 'client-s.gateway.messenger.live.com'
     @headers['Connection'] = 'keep-alive'
     @headers['Accept-Encoding'] = 'gzip, deflate'
+    self = @
+    backup = JSON.stringify
+      expire: new Date(new Date().getTime() + self.reconnectInterval * 60 * 1000)
+      headers: self.headers
+
+    fs.writeFile 'hubot-skype-web.backup', backup, (err) ->
+      if err
+        self.robot.logger.error 'IO error while storing ' +
+                             'Skype headers to disc:' + err
+      else
+        self.robot.logger.debug 'Skype headers stored to disc successfully'
 
 
   # @private
