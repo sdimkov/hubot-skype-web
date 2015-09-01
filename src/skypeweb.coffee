@@ -287,6 +287,12 @@ class SkypeWebAdapter extends Adapter
           try
             if body.trim()
               body = JSON.parse body
+
+              if 0 == Object.keys(body).length
+                throw new Error "empty response"
+              else if body.errorCode?
+                throw new Error body.message
+
               self.onEventMessage msg for msg in body.eventMessages
           catch err
             self.robot.logger.error 'Parsing poll results failed: ' + err
