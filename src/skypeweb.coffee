@@ -282,14 +282,20 @@ class SkypeWebAdapter extends Adapter
       gzip: true,
       (error, response, body) ->
         if error
-          self.robot.logger.error 'Poll request failed: ' + error
+          self.robot.logger.error "Poll request failed: #{error}"
         else
           try
             if body.trim()
               body = JSON.parse body
-              self.onEventMessage msg for msg in body.eventMessages
+              if body.eventMessages
+                self.onEventMessage message for message in body.eventMessages
+              else if body.errorCode
+                self.robot.logger.error "Poll response error #{body.errorCode}: #{body.message}"
+              else
+                self.robot.logger.error "Unexpected poll response body: #{body}"
           catch err
-            self.robot.logger.error 'Parsing poll results failed: ' + err
+            self.robot.logger.error "Parsing poll results failed: " +
+                                              "#{err} body='#{body}'"
         self.pollRequest()
     )
 
