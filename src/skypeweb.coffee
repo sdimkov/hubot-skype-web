@@ -211,7 +211,7 @@ class SkypeWebAdapter extends Adapter
   # @private
   # Store skype message to be send in queues
   #
-  # @note This prevents this prevents newer messages to be received prior
+  # @note This prevents newer messages from being received prior
   #   to older ones due to the async nature of the requests being made
   #
   # @param user [String] the recipient of the message
