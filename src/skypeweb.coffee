@@ -14,7 +14,7 @@ class SkypeWebAdapter extends Adapter
   constructor: (@robot) ->
     super @robot
 
-    url       = "https://client-s.gateway.messenger.live.com"
+    url       = "https://bay-client-s.gateway.messenger.live.com"
     @pollUrl  = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
     @sendUrl  = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
     @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
@@ -163,7 +163,7 @@ class SkypeWebAdapter extends Adapter
       @headers[header.name] = header.value
     # Clear Content-Length as we won't bother setting correct value
     delete @headers['Content-Length']
-    @headers['Host'] = 'client-s.gateway.messenger.live.com'
+    @headers['Host'] = 'bay-client-s.gateway.messenger.live.com'
     @headers['Connection'] = 'keep-alive'
     @headers['Accept-Encoding'] = 'gzip, deflate'
     self = @
