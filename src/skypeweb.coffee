@@ -3,6 +3,7 @@ request = require 'request'
 util    = require 'util'
 escape  = require 'escape-html'
 fs      = require 'fs'
+URL     = require 'url-parse'
 
 {Adapter, TextMessage, User} = require 'hubot'
 
@@ -14,9 +15,8 @@ class SkypeWebAdapter extends Adapter
   constructor: (@robot) ->
     super @robot
 
-    url       = "https://client-s.gateway.messenger.live.com"
-    @pollUrl  = "#{url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
-    @sendUrl  = (user) -> "#{url}/v1/users/ME/conversations/#{user}/messages"
+    @getPollUrl =        -> "#{@url}/v1/users/ME/endpoints/SELF/subscriptions/0/poll"
+    @getSendUrl = (user) -> "#{@url}/v1/users/ME/conversations/#{user}/messages"
     @sendBody = messagetype: 'RichText', contenttype: 'text', content: ''
     @sendQueues = {}
     @headers    = false
@@ -127,7 +127,7 @@ class SkypeWebAdapter extends Adapter
                 self.robot.logger.info 'SkypeWeb adapter logged in successfully!'
                 self.robot.logger.debug 'Captured poll request: \n' +
                                         util.inspect request
-                self.copyHeaders request
+                self.copyRequest request
                 success = true
                 options?.success?()
           else
@@ -150,14 +150,19 @@ class SkypeWebAdapter extends Adapter
 
 
   # @private
-  # Stores all request headers of the intercepted request for later use.
+  # Stores details of the intercepted request for later use.
   #
-  # @note Most importantly it optains the RegistrationToken which is used
+  # @note Most importantly it obtains the RegistrationToken which is used
   #   to authenticate the requests for receiving or sending messages
   #
   # @param request [Request] the poll request made from skype web client
   #
-  copyHeaders: (request) ->
+  copyRequest: (request) ->
+    # Copy base URL from poll request
+    requestUrl = new URL request.url
+    @url = requestUrl.protocol + '//' + requestUrl.host
+    @pollUrl = @getPollUrl()
+    # Copy poll request headers into a map
     @headers = {}
     for header in request.headers
       @headers[header.name] = header.value
@@ -251,7 +256,7 @@ class SkypeWebAdapter extends Adapter
     @sendBody.clientmessageid = now
     @sendBody.content = escape msg
     request.post(
-      url: @sendUrl(user),
+      url: @getSendUrl(user),
       headers: @headers,
       body: @sendBody,
       gzip: true, json: true,
