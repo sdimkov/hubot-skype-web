@@ -61,6 +61,8 @@ class SkypeWebAdapter extends Adapter
     if backup and new Date(backup.expire) > new Date()
       self.robot.logger.info 'Skype headers restored from backup.'
       self.headers = backup.headers
+      self.url = backup.url
+      self.pollUrl = self.getPollUrl()
       success()
       setTimeout (-> self.login()), 5000
     else
@@ -173,6 +175,7 @@ class SkypeWebAdapter extends Adapter
     @headers['Accept-Encoding'] = 'gzip, deflate'
     self = @
     backup = JSON.stringify
+      url: @url
       expire: new Date(new Date().getTime() + self.reconnectInterval * 60 * 1000)
       headers: self.headers
 
