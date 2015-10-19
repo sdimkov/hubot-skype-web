@@ -142,9 +142,15 @@ class SkypeWebAdapter extends Adapter
         page.open 'https://web.skype.com', (status) ->
           setTimeout (->
             page.evaluate ((username, password) ->
-              document.getElementById('username').value = username
-              document.getElementById('password').value = password
-              document.getElementById('signIn').click()
+              try
+                document.getElementById('username').value = username
+                document.getElementById('password').value = password
+                document.getElementById('signIn').click()
+              catch e
+                throw e unless document.getElementById 'captcha'
+                throw new Error 'Captcha detected at the Skype login screen. ' +
+                                'Please resolve the captcha manually and '     +
+                                'make sure you use correct credentials.'
             ), (->), self.username, self.password
           ), 5000  # after 5 secs
 
