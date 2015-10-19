@@ -305,11 +305,11 @@ class SkypeWebAdapter extends Adapter
                 self.onEventMessage message for message in body.eventMessages
               else if body.errorCode
                 self.robot.logger.error "Poll response error #{body.errorCode}: #{body.message}"
-              else
-                self.robot.logger.error "Unexpected poll response body: #{body}"
+              else if Object.keys(body).length > 0
+                self.robot.logger.error "Unexpected poll response body: #{util.inspect body}"
           catch err
             self.robot.logger.error "Parsing poll results failed: " +
-                                              "#{err} body='#{body}'"
+                                              "#{err} body='#{util.inspect body}'"
         self.pollRequest()
     )
 
