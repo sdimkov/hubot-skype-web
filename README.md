@@ -46,6 +46,13 @@ Contributing
 
 Patches are welcome. Browse the [documentation](https://cdn.rawgit.com/sdimkov/hubot-skype-web/v0.9.6/doc/index.html) to get started.
 
+Troubleshooting
+---------------
+
+Please fill in issues to this Github project istead of emailing me directly. Keeping the communication here saves me from answering multiple emails for the same things.
+
+You may have troubles running this under Linux with PhantomJS 1.9. You should try using 2.0. At the time of writting this there is still no official build. You can find my build [here](https://groups.google.com/forum/#!searchin/phantomjs/dimkov/phantomjs/CAasXq1Yzz0/fyjIm58cXk8J).
+
 Licence
 -------
 
