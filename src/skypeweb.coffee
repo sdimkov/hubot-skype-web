@@ -136,8 +136,8 @@ class SkypeWebAdapter extends Adapter
             self.robot.logger.debug 'Skype during login: ' + request.url
         # Use sane user-agent
         page.set 'settings.userAgent',
-          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 ' +
-          '(KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 ' +
+          '(KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36'
         # Login to skype web
         page.open 'https://web.skype.com', (status) ->
           setTimeout (->
