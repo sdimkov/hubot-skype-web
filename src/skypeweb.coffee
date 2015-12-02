@@ -141,17 +141,32 @@ class SkypeWebAdapter extends Adapter
         # Login to skype web
         page.open 'https://web.skype.com', (status) ->
           setTimeout (->
-            page.evaluate ((username, password) ->
-              try
-                document.getElementById('username').value = username
-                document.getElementById('password').value = password
-                document.getElementById('signIn').click()
-              catch e
-                throw e unless document.getElementById 'captcha'
-                throw new Error 'Captcha detected at the Skype login screen. ' +
-                                'Please resolve the captcha manually and '     +
-                                'make sure you use correct credentials.'
-            ), (->), self.username, self.password
+            try
+              if self.username.indexOf('@') is -1
+                page.evaluate ((username, password) ->
+                  document.getElementById('username').value = username
+                  document.getElementById('password').value = password
+                  document.getElementById('signIn').click()
+                ), (->), self.username, self.password
+              else  # login with a Windows Live account
+                # Submit username to trigger redirect
+                page.evaluate ((username) ->
+                  document.getElementById('username').value = username
+                  document.getElementById('signIn').click()
+                ), (->), self.username
+                # Wait a redirect to Windows Live login page
+                setTimeout (->
+                  page.evaluate ((password) ->
+                    document.querySelector('input[type="password"]').value = password
+                    document.querySelector('input[type="submit"]').click()
+                  ), (->), self.password
+                ), 5000
+            catch e
+              throw e unless document.getElementById 'captcha' or
+                             document.getElementById 'icdHIP'
+              throw new Error 'Captcha detected at the Skype login screen. ' +
+                  'Please resolve the captcha manually and '     +
+                  'make sure you use correct credentials.'
           ), 5000  # after 5 secs
 
     ), phantomOptions
