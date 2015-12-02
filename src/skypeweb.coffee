@@ -164,8 +164,8 @@ class SkypeWebAdapter extends Adapter
               throw e unless document.getElementById 'captcha' or
                              document.getElementById 'icdHIP'
               throw new Error 'Captcha detected at the Skype login screen. ' +
-                  'Please resolve the captcha manually and '     +
-                  'make sure you use correct credentials.'
+                              'Please resolve the captcha manually and '     +
+                              'make sure you use correct credentials.'
           ), 5000  # after 5 secs
 
     ), phantomOptions
