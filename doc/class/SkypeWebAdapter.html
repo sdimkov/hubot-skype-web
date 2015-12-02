@@ -92,15 +92,15 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#copyHeaders-dynamic'>
+      <a href='#copyRequest-dynamic'>
         #
 (void)
-<b>copyHeaders</b><span>(request)</span>
+<b>copyRequest</b><span>(request)</span>
       </a>
     </span>
     <span class='note private title'>Private</span>
     <span class='desc'>
-      Stores all request headers of the intercepted request for later use. 
+      Stores details of the intercepted request for later use. 
     </span>
   </li>
   <li>
@@ -272,19 +272,19 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='copyHeaders-dynamic'>
+    <p class='signature' id='copyRequest-dynamic'>
       #
 (void)
-<b>copyHeaders</b><span>(request)</span>
+<b>copyRequest</b><span>(request)</span>
       <span class='note private'>Private</span>
       <br>
     </p>
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    Most importantly it optains the RegistrationToken which is used to authenticate the requests for receiving or sending messages 
+    Most importantly it obtains the RegistrationToken which is used to authenticate the requests for receiving or sending messages 
   </div>
-  <p>Stores all request headers of the intercepted request for later use.</p>
+  <p>Stores details of the intercepted request for later use.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -340,7 +340,7 @@
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    This prevents this prevents newer messages to be received prior to older ones due to the async nature of the requests being made 
+    This prevents newer messages from being received prior to older ones due to the async nature of the requests being made 
   </div>
   <p>Store skype message to be send in queues</p>
 </div>
@@ -432,7 +432,7 @@
 </div>
     </div>
     <div id='footer'>
-  July 04, 15 18:45:31 by
+  December 02, 15 04:28:03 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

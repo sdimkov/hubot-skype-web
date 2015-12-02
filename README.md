@@ -44,7 +44,7 @@ Optional Environment variables:
 Contributing
 ------------
 
-Patches are welcome. Browse the [documentation](https://cdn.rawgit.com/sdimkov/hubot-skype-web/v0.9.6/doc/index.html) to get started.
+Patches are welcome. Browse the [documentation](https://cdn.rawgit.com/sdimkov/hubot-skype-web/v0.9.10/doc/index.html) to get started.
 
 Troubleshooting
 ---------------
