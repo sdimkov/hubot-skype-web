@@ -4,7 +4,7 @@ hubot-skype-web
 A [Skype](http://www.skype.com/) adapter for [Hubot](https://hubot.github.com/) that connects via Skype web.
 
 [![Version](https://img.shields.io/npm/v/hubot-skype-web.svg)](https://github.com/sdimkov/hubot-skype-web/releases)
-[![Licence](https://img.shields.io/npm/l/express.svg)](https://github.com/sdimkov/hubot-skype-web/blob/master/LICENSE)
+[![License](https://img.shields.io/npm/l/express.svg)](https://github.com/sdimkov/hubot-skype-web/blob/master/LICENSE)
 [![Downloads](https://img.shields.io/npm/dm/hubot-skype-web.svg)](https://www.npmjs.com/package/hubot-skype-web)
 
 This adapter allows integrating your Hubot with Skype.
@@ -53,7 +53,7 @@ Please fill in issues to this Github project istead of emailing me directly. Kee
 
 You may have troubles running this under Linux with PhantomJS 1.9. You should try using 2.0. At the time of writting this there is still no official build. You can find my build [here](https://groups.google.com/forum/#!searchin/phantomjs/dimkov/phantomjs/CAasXq1Yzz0/fyjIm58cXk8J).
 
-Licence
+License
 -------
 
-The MIT License (MIT). Please see LICENCE file for more information.
+The MIT License (MIT). Please see LICENSE file for more information.

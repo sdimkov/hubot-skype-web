@@ -193,18 +193,18 @@ class SkypeWebAdapter extends Adapter
     @headers['Host'] = 'client-s.gateway.messenger.live.com'
     @headers['Connection'] = 'keep-alive'
     @headers['Accept-Encoding'] = 'gzip, deflate'
-    self = @
+    # Backup request details to disk for re-use after reboot
     backup = JSON.stringify
       url: @url
-      expire: new Date(new Date().getTime() + self.reconnectInterval * 60 * 1000)
-      headers: self.headers
-
+      expire: new Date(new Date().getTime() + @reconnectInterval * 60 * 1000)
+      headers: @headers
+    self = @
     fs.writeFile 'hubot-skype-web.backup', backup, (err) ->
       if err
         self.robot.logger.error 'IO error while storing ' +
                              'Skype headers to disc:' + err
       else
-        self.robot.logger.debug 'Skype headers stored to disc successfully'
+        self.robot.logger.debug 'Skype headers stored to disk successfully'
 
 
   # @private
@@ -237,7 +237,7 @@ class SkypeWebAdapter extends Adapter
 
 
   # @private
-  # Store skype message to be send in queues
+  # Store Skype message to be send in queues
   #
   # @note This prevents newer messages from being received prior
   #   to older ones due to the async nature of the requests being made
@@ -265,7 +265,7 @@ class SkypeWebAdapter extends Adapter
 
 
   # @private
-  # Sends POST request to skype containing new message to given user
+  # Sends POST request to Skype containing new message to given user
   #
   # @note it recursively calls itself until queues are empty
   #
@@ -323,7 +323,7 @@ class SkypeWebAdapter extends Adapter
                 self.robot.logger.error "Unexpected poll response body: #{util.inspect body}"
           catch err
             self.robot.logger.error "Parsing poll results failed: " +
-                                              "#{err} body='#{util.inspect body}'"
+                                 "#{err} body='#{util.inspect body}'"
         self.pollRequest()
     )
 
