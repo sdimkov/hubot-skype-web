@@ -3,6 +3,7 @@ request = require 'request'
 util    = require 'util'
 escape  = require 'escape-html'
 fs      = require 'fs'
+path    = require 'path'
 URL     = require 'url-parse'
 
 {Adapter, TextMessage, User} = require 'hubot'
@@ -109,10 +110,13 @@ class SkypeWebAdapter extends Adapter
       ph.createPage (page) ->
         # Execute fail condition if login time limit expires
         errorTimer = setTimeout (->
-          self.robot.logger.error 'SkypeWeb adapter failed to login!'
-          page.close()
-          ph.exit 0
-          options?.error?()
+          self.robot.logger.error 'Timeout in waiting for login success!'
+          page.render 'login-failure.png', ->
+            self.robot.logger.error "Screenshot saved at: " +
+                process.cwd() + path.sep + 'login-failure.png'
+            page.close()
+            ph.exit 0
+            options?.error?()
         ), 50000  # after 50 secs
         # Monitor outgoing requests until proper poll request appears
         requestsCount = 0
@@ -140,33 +144,26 @@ class SkypeWebAdapter extends Adapter
         # Login to skype web
         page.open 'https://web.skype.com', (status) ->
           setTimeout (->
-            try
-              if self.username.indexOf('@') is -1
-                page.evaluate ((username, password) ->
-                  document.getElementById('username').value = username
-                  document.getElementById('password').value = password
-                  document.getElementById('signIn').click()
-                ), (->), self.username, self.password
-              else  # login with a Windows Live account
-                # Submit username to trigger redirect
-                page.evaluate ((username) ->
-                  document.getElementById('username').value = username
-                  document.getElementById('signIn').click()
-                ), (->), self.username
-                # Wait a redirect to Windows Live login page
-                setTimeout (->
-                  page.evaluate ((password) ->
-                    document.querySelector('input[type="password"]').value = password
-                    document.querySelector('input[type="submit"]').click()
-                  ), (->), self.password
-                ), 5000
-            catch e
-              throw e unless document.getElementById 'captcha' or
-                             document.getElementById 'icdHIP'
-              throw new Error 'Captcha detected at the Skype login screen. ' +
-                              'Please resolve the captcha manually and '     +
-                              'make sure you use correct credentials.'
-          ), 5000  # after 5 secs
+            if self.username.indexOf('@') is -1
+              page.evaluate ((username, password) ->
+                document.getElementById('username').value = username
+                document.getElementById('password').value = password
+                document.getElementById('signIn').click()
+              ), (->), self.username, self.password
+            else  # login with a Windows Live account
+              # Submit username to trigger redirect
+              page.evaluate ((username) ->
+                document.getElementById('username').value = username
+                document.getElementById('signIn').click()
+              ), (->), self.username
+              # Wait a redirect to Windows Live login page
+              setTimeout (->
+                page.evaluate ((password) ->
+                  document.querySelector('input[type="password"]').value = password
+                  document.querySelector('input[type="submit"]').click()
+                ), (->), self.password
+              ), 5000
+          ), 5000
 
     ), phantomOptions
 
