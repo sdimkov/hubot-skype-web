@@ -30,7 +30,7 @@ class SkypeWebAdapter extends Adapter
       throw new Error 'Provide a valid username in HUBOT_SKYPE_USERNAME!'
     # Read and validate password
     @password = process.env.HUBOT_SKYPE_PASSWORD
-    if not @username or @username.length < 2
+    if not @password or @password.length < 2
       throw new Error 'Provide a valid password in HUBOT_SKYPE_PASSWORD!'
     # Read and validate reconnect interval
     @reconnectInterval = 240
