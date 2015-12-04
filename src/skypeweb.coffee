@@ -5,6 +5,7 @@ escape  = require 'escape-html'
 fs      = require 'fs'
 path    = require 'path'
 URL     = require 'url-parse'
+PageHelper = require './page_helper'
 
 {Adapter, TextMessage, User} = require 'hubot'
 
@@ -143,28 +144,16 @@ class SkypeWebAdapter extends Adapter
           'Mozilla (Windows NT) AppleWebKit KHTML, like Gecko) Chrome'
         # Login to skype web
         page.open 'https://web.skype.com', (status) ->
-          setTimeout (->
+          helper = new PageHelper page
+          helper.wait '#username', ->
             if self.username.indexOf('@') is -1
-              page.evaluate ((username, password) ->
-                document.getElementById('username').value = username
-                document.getElementById('password').value = password
-                document.getElementById('signIn').click()
-              ), (->), self.username, self.password
+              helper.fillForm '#username': self.username, '#password': self.password
             else  # login with a Windows Live account
               # Submit username to trigger redirect
-              page.evaluate ((username) ->
-                document.getElementById('username').value = username
-                document.getElementById('signIn').click()
-              ), (->), self.username
+              helper.fillForm '#username': self.username
               # Wait a redirect to Windows Live login page
-              setTimeout (->
-                page.evaluate ((password) ->
-                  document.querySelector('input[type="password"]').value = password
-                  document.querySelector('input[type="submit"]').click()
-                ), (->), self.password
-              ), 5000
-          ), 5000
-
+              helper.wait 'input[type="submit"]', ->
+                helper.fillForm 'input[type="password"]': self.password
     ), phantomOptions
 
 
