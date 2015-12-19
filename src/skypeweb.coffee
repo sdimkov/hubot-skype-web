@@ -123,10 +123,10 @@ class SkypeWebAdapter extends Adapter
         requestsCount = 0
         success       = false
         page.set 'onResourceRequested', (request) ->
-          if request.url.indexOf 'poll' > 0 and request.method is 'POST'
+          if request.method is 'POST'
             for header in request.headers
               if header.name is 'RegistrationToken'
-                return if requestsCount++ < 5 or success
+                return if requestsCount++ < 1 or success
                 page.close()
                 ph.exit 0
                 # Clear timer for error condition
@@ -179,6 +179,7 @@ class SkypeWebAdapter extends Adapter
     @headers['Host'] = 'client-s.gateway.messenger.live.com'
     @headers['Connection'] = 'keep-alive'
     @headers['Accept-Encoding'] = 'gzip, deflate'
+    @headers['X-SkypeToken'] = @headers['RegistrationToken'].split("=")[1]
     # Backup request details to disk for re-use after reboot
     backup = JSON.stringify
       url: @url
