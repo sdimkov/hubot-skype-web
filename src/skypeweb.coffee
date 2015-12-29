@@ -209,7 +209,7 @@ class SkypeWebAdapter extends Adapter
       @eventsCache.push msg.resource.id
       userID = msg.resource.from.split('/contacts/')[1].replace '8:', ''
       # Ignore messages sent by the robot
-      return if userID is @username
+      return if userID.toLowerCase() is @username.toLowerCase()
       user = @robot.brain.userForId userID
       user.room = msg.resource.conversationLink.split('/conversations/')[1]
       # Let robot know messages in personal chats are directed at him
