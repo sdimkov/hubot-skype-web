@@ -21,7 +21,9 @@ class PageHelper
       else
         now = (new Date).getTime()
         if now - start < self.options.waitMax * 1000
-          self.wait selector, callback, start
+          setTimeout (->
+            self.wait selector, callback, start
+          ), self.options.waitStep
         else
           throw new Error "Timeout after #{self.options.waitMax} " +
                                "sec while waiting for '#{selector}'"
