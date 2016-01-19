@@ -40,6 +40,7 @@ Mandatory Environment variables:
 Optional Environment variables:
 * `HUBOT_SKYPE_RECONNECT` _Integer, default: 240_ - The duration between reconnects in minutes. Minimum value is 20. Reconnect does not disturb hubot's uptime.
 * `HUBOT_LOG_LEVEL` _String [debug|info|notice|warning|error|critical|alert|emergency], default: info_ - Set the log level of Hubot. The SkypeWeb adapter can output extensive debug messages.
+* `HUBOT_SKYPE_MAX_MESSAGE_LENGTH` _Integer, default 1500_ - The maximum length of the message, longer messages are splitted
 
 Contributing
 ------------
