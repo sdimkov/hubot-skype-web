@@ -202,7 +202,7 @@ class SkypeWebAdapter extends Adapter
   onEventMessage: (msg) ->
     if (msg.resourceType is 'NewMessage' and
         msg.resource?.messagetype in ['Text', 'RichText'])
-      # Make sure we don't process same pessage once
+      # Make sure we don't process same pessage more than once
       # (Happens when you switch RegistrationToken-s)
       return if msg.resource.id in @eventsCache
       @eventsCache.shift()
