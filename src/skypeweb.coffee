@@ -41,6 +41,14 @@ class SkypeWebAdapter extends Adapter
         @robot.logger.warning 'HUBOT_SKYPE_RECONNECT is the adapter ' +
                   'reconnect interval in minutes! (optional parameter)'
         throw new Error 'Minimum reconnect interval is 20 minutes!'
+    # Read and validate max message length
+    @maxLength = 1500
+    if process.env.HUBOT_SKYPE_MAX_MESSAGE_LENGTH
+      @maxLength = parseInt process.env.HUBOT_SKYPE_MAX_MESSAGE_LENGTH
+      @robot.logger.info('Set max message length to ' + @maxLength)
+      unless 30 <= @maxLength and @maxLength <= 100000
+        throw new Error 'HUBOT_SKYPE_MAX_MESSAGE_LENGTH must be ' +
+                  'between 30 and 100000'
 
 
   # Starts the adapter
@@ -236,10 +244,10 @@ class SkypeWebAdapter extends Adapter
     @sendQueues[user] ||= []
     queue = @sendQueues[user]
     # Split messages that can't be sent at once
-    if msg.length > 1500
+    if msg.length > @maxLength
       @robot.logger.warning 'Message too long for sending! Splitting...'
-      index = msg.substring(0, 1500).lastIndexOf("\n")
-      index = 1500 if index is -1
+      index = msg.substring(0, @maxLength).lastIndexOf("\n")
+      index = @maxLength if index is -1
       @sendInQueue user, msg.substring 0, index
       @sendInQueue user, msg.substring index + 1
       return
@@ -247,7 +255,7 @@ class SkypeWebAdapter extends Adapter
     len = queue.length
     return @sendRequest user, msg if len is 1
     # Optimize queue by truncating next messages
-    if len > 2 and queue[len-1].length + queue[len-2].length < 1500
+    if len > 2 and queue[len-1].length + queue[len-2].length < @maxLength
       queue[len-2] += "\n" + queue.pop()
 
 
