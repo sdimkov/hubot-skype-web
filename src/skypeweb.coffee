@@ -111,7 +111,7 @@ class SkypeWebAdapter extends Adapter
   #
   login: (options = {}) ->
     self = @
-    phantomOptions = {}
+    phantomOptions = parameters: 'web-security': false
     if process.platform.indexOf('win') isnt -1
       # Disable dnode with weak on Windows hosts
       phantomOptions.dnodeOpts = weak: false
