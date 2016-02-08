@@ -23,7 +23,7 @@ Also note that this adapter can not connect to the old P2P group chats. That's a
 Getting started
 ---------------
 
-1. Install [PhantomJS](http://phantomjs.org/). This adapter depends on [phantom](https://github.com/sgentle/phantomjs-node) which expects you to manually install the PhantomJS binary and expose it in PATH
+1. Install [PhantomJS](http://phantomjs.org/). This adapter depends on [phantom](https://github.com/amir20/phantomjs-node) which expects you to manually install the PhantomJS binary and expose it in PATH
 3. Export necessary environment variables.
 4. Add `hubot-skype-web` as dependency in your package.json: `npm install hubot-skype-web --save`
 5. Start your hubot with the Skype Web adapter: `hubot --adapter skype-web`
