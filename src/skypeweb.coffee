@@ -131,7 +131,7 @@ class SkypeWebAdapter extends Adapter
         requestsCount = 0
         success       = false
         page.set 'onResourceRequested', (request) ->
-          if request.method is 'POST'
+          if request.method is 'PUT'
             for header in request.headers
               if header.name is 'RegistrationToken'
                 return if requestsCount++ < 1 or success
@@ -187,7 +187,6 @@ class SkypeWebAdapter extends Adapter
     @headers['Host'] = 'client-s.gateway.messenger.live.com'
     @headers['Connection'] = 'keep-alive'
     @headers['Accept-Encoding'] = 'gzip, deflate'
-    @headers['X-SkypeToken'] = @headers['RegistrationToken'].split("=")[1]
     # Backup request details to disk for re-use after reboot
     backup = JSON.stringify
       url: @url
@@ -270,26 +269,27 @@ class SkypeWebAdapter extends Adapter
   sendRequest: (user, msg) ->
     self = @
     now = new Date().getTime()
-    @headers.ContextId        = now
+    @headers['ContextId'] = 'tcid=' + now
     @sendBody.clientmessageid = now
     @sendBody.content = escape msg
     request.post(
       url: @getSendUrl(user),
       headers: @headers,
       body: @sendBody,
-      gzip: true, json: true,
+      gzip: true,
+      json: true,
       (error, response, body) ->
-        unless response.statusCode in [200, 201]
-          self.robot.logger.error "Send request returned status " +
-              "#{response.statusCode}. user='#{user}' msg='#{msg}'"
         if error
           self.robot.logger.error "Send request failed: " + error
-        self.sendQueues[user].shift()
-        # process remaining messages in queue
-        if self.sendQueues[user].length isnt 0
-          self.sendRequest user, self.sendQueues[user][0]
+        else
+          unless response.statusCode in [200, 201]
+            self.robot.logger.error "Send request returned status " +
+                "#{response.statusCode}. errorMessage='#{body.message}' user='#{user}' msg='#{msg}'"
+          self.sendQueues[user].shift()
+          # process remaining messages in queue
+          if self.sendQueues[user].length isnt 0
+            self.sendRequest user, self.sendQueues[user][0]
     )
-
 
   # @private
   # Polls the server for new events.
@@ -298,7 +298,7 @@ class SkypeWebAdapter extends Adapter
   #
   pollRequest: ->
     self = @
-    @headers.ContextId = new Date().getTime()
+    @headers.ContextId = "tcid=" + new Date().getTime()
     request.post(
       url: @pollUrl,
       headers: @headers,
