@@ -154,14 +154,11 @@ class SkypeWebAdapter extends Adapter
         page.open 'https://web.skype.com', (status) ->
           helper = new PageHelper page
           helper.wait '#username', ->
-            if self.username.indexOf('@') is -1
-              helper.fillForm '#username': self.username, '#password': self.password
-            else  # login with a Windows Live account
-              # Submit username to trigger redirect
-              helper.fillForm '#username': self.username
-              # Wait a redirect to Windows Live login page
-              helper.wait 'input[type="submit"]', ->
-                helper.fillForm 'input[type="password"]': self.password
+            # Submit username to trigger redirect
+            helper.fillForm '#username': self.username
+            # Wait a redirect to Windows Live login page
+            helper.wait 'input[type="submit"]', ->
+              helper.fillForm 'input[type="password"]': self.password
     ), phantomOptions
 
 

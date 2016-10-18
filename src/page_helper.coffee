@@ -34,7 +34,7 @@ class PageHelper
     @page.evaluate ((fields) ->
       for selector, value of fields
         document.querySelector(selector).value = value
-      document.querySelector("[type='submit']").click()
+      document.forms[0].submit()
     ), (->), fields
 
 
